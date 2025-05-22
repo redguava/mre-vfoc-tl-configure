@@ -1,12 +1,28 @@
-# React + Vite
+# Minimal Reproducible Example
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+This repository shows that vitest-fail-on-console fails to trigger a failure for a `console.error`
+if `@testing-library/react` is imported in vitest's setup file e.g., when configuring 
+testing-library:
 
-Currently, two official plugins are available:
+```js
+import { configure } from '@testing-library/react'
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+configure({
+    asyncUtilTimeout: 4_000
+})
+```
 
-## Expanding the ESLint configuration
+It's not necessary to actually use logic from `@testing-library/react`. The below is enough to 
+prevent the test from failing although it should:
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+```js
+import * as noop from '@testing-library/react'
+
+// noop could be unused, and the misbehavior would still be reproduced
+```
+
+See the following files:
+
+- [vitest-setup.js](vitest-setup.js)
+- [src/App.jsx](src/App.jsx)
+- [src/App.test.jsx](src/App.test.jsx)
